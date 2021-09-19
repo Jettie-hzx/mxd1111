@@ -3,9 +3,13 @@
     <nav-bar class="home-nav">
       <template #center>购物街</template>
     </nav-bar>
-    <tab-control :titles="titles" 
-    @itemClick="changeGoods" ref="tabControl1"
-    v-show="isTabShow" class="deceitTap"></tab-control>
+    <tab-control
+      :titles="titles"
+      @itemClick="changeGoods"
+      ref="tabControl1"
+      v-show="isTabShow"
+      class="deceitTap"
+    ></tab-control>
     <!-- <di-gui :list="list"></di-gui> -->
     <scroll
       class="home-scroll"
@@ -15,17 +19,21 @@
       @pullingUp="loadMore"
       @scroll="contentScroll"
     >
-      <home-swiper :banners="banners" @homeSwiperLoad="homeSwiperLoad"/>
-      <home-recommend :recommends="recommends"></home-recommend>
-      <feature-view></feature-view>
+      <home-swiper :banners="banners" @homeSwiperLoad="tabUpImageLoad" />
+      <home-recommend
+        :recommends="recommends"
+        @recommendLoad="tabUpImageLoad"
+      />
+      <feature-view @featureViewLoad="tabUpImageLoad" />
       <transition name="fade">
-        <tab-control :titles="titles" @itemClick="changeGoods" ref="tabControl2"
+        <tab-control
+          :titles="titles"
+          @itemClick="changeGoods"
+          ref="tabControl2"
         ></tab-control>
       </transition>
       <goods-list :goodsList="goodsList" />
     </scroll>
-    <back-top v-show="isBackShow" 
-    @click.native="backTop"/>
   </div>
 </template>
 
@@ -34,7 +42,6 @@ import NavBar from "components/common/navbar/NavBar.vue";
 //import Scroll from "components/common/scroll/Scroll.vue";
 import TabControl from "components/content/tabControl/TabControl.vue";
 import GoodsList from "components/content/goods/GoodsList.vue";
-import BackTop from "components/content/backTop/BackTop.vue";
 
 import HomeSwiper from "./childComps/HomeSwiper.vue";
 import HomeRecommend from "./childComps/HomeRecommend.vue";
@@ -42,15 +49,16 @@ import FeatureView from "./childComps/FeatureView.vue";
 //import DiGui from "./childComps/DiGui.vue";
 import { getHomeMuitidata, getHomeGoods } from "network/home";
 
-//import { throttle } from "common/util";
+//import { debounce } from "common/util";
 
 export default {
   name: "Home",
+
   components: {
     NavBar,
     TabControl,
     GoodsList,
-    BackTop,
+    //BackTop,
     //Scroll,
     HomeSwiper,
     HomeRecommend,
@@ -60,6 +68,7 @@ export default {
   },
   data() {
     return {
+      //home_swiper:0,
       banners: [],
       recommends: [],
       titles: ["流行", "新款", "精选"],
@@ -69,11 +78,22 @@ export default {
         sell: { page: 0, list: [] },
       },
       currentType: "pop",
-      isTabShow:false,
-      isBackShow: false,
-      tabOffsetTop:0
+      isTabShow: false,
+      //isBackShow: false,
+      tabOffsetTop: 0,
+      // tabTopY: {
+      //   pop: 0,
+      //   new: 0,
+      //   sell: 0,
+      // },
+      //saveY:0
     };
   },
+  // filters:{
+  //   cut(val){
+  //     return Number(val/10000).toFixed(1)+"万"
+  //   }
+  // },
   created() {
     // this.throttleScroll=throttle(function(p){
     //   console.log(p);
@@ -83,9 +103,27 @@ export default {
     this.getHomeGoods("new");
     this.getHomeGoods("sell");
   },
- 
+  mounted() {
+    //  setTimeout(() => {
+    //    this.forceRerender()
+    //  }, 400);
+    //  const debounceRe=debounce(this.$refs.scroll.refresh,200)
+    //  this.$bus.$on("itemImageLoad",()=>{
+    //    debounceRe()
+    //  })
+  },
+  //  activated(){
+  //    this.$refs.scroll.scrollTo(0,this.saveY,0)
+  //  },
+  //  deactivated(){
+  //    this.saveY=this.$refs.scroll.getScrollY()
+  //  },
   methods: {
+    //debounceRe:debounce(this.$refs.scroll.refresh,200),
+    
     changeGoods(index) {
+      // const cacheTopY=this.tabTopY[this.currentType]
+      // const cacheType=this.currentType
       switch (index) {
         case 0:
           this.currentType = "pop";
@@ -97,36 +135,50 @@ export default {
           this.currentType = "sell";
           break;
       }
-      this.$refs.tabControl1.currentIndex=index
-      this.$refs.tabControl2.currentIndex=index
+      this.$refs.tabControl1.currentIndex = index;
+      this.$refs.tabControl2.currentIndex = index;
+
+      //this.$refs.scroll.scrollTo(0, this.tabTopY[this.currentType], 0);
+      //this.tabTopY[cacheType]=cacheTopY
     },
     // contentScroll:function(y){
     //   console.log(y);
     // },
-   
-    contentScroll(position){
-      // return throttle(function(){
-      //   console.log(position);
-      // },1000)(position)
-      //console.log(this.tabOffsetTop);
-      this.isBackShow=Math.abs(position.y)>1000
-      this.isTabShow=(-position.y)>= this.tabOffsetTop - 44
+
+    contentScroll(position) {
+      //console.log(position);
+      this.isTabShow = -position.y >= this.tabOffsetTop - 44;
       //console.log(position.y);
-      //console.log(this.$refs.tabControl1.$el.offsetTop);
+    
+        // if (!this.isTabShow) {
+        //  // this.$refs.scroll.refresh()
+        //   for (let key in this.tabTopY) {
+        //     this.tabTopY[key] = position.y;
+        //   }
+        // }
+        // this.tabTopY[this.currentType] = position.y;
+      
     },
-    backTop(){
-     this.$refs.scroll.scrollTo(0,0,500)
+
+    async loadMore() {
+      this.$loading.show();
+      await this.getHomeGoods(this.currentType);
+      this.$loading.hide();
+      this.$refs.scroll.finishPullUp();
     },
-    async loadMore(){
-      this.$loading.show()
-     await this.getHomeGoods(this.currentType)
-     this.$loading.hide()
-     this.$refs.scroll.finishPullUp()
-    },
-    homeSwiperLoad(){
+    tabUpImageLoad() {
       //this.$refs.scroll.refresh();
-      this.tabOffsetTop=this.$refs.tabControl2.$el.offsetTop
+      this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
+      //console.log(this.tabOffsetTop);
+      // this.tabTopY = {
+      //   pop: -(this.tabOffsetTop-44),
+      //   new: -(this.tabOffsetTop-44),
+      //   sell: -(this.tabOffsetTop-44),
+      // };
     },
+    // forceRerender(){
+    //   this.home_swiper+=1
+    // },
     //请求数据的方法
     async getHomeMuitidata() {
       const { data } = await getHomeMuitidata();
@@ -154,7 +206,6 @@ export default {
     goodsList() {
       return this.goods[this.currentType].list;
     },
-   
   },
   watch: {
     //监视页面数据更新，及时refresh scroll组件
@@ -189,7 +240,7 @@ export default {
   overflow: hidden;
   height: calc(100% - 93px);
 }
-.deceitTap{
+.deceitTap {
   position: fixed;
   top: 44px;
   left: 0;

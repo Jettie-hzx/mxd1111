@@ -5,9 +5,11 @@ import store from './store'
 import "assets/css/base.css"
 import Scroll from "components/common/scroll/Scroll.vue";
 import loading from "components/common/loading"
+import toast from "components/common/toast"
 Vue.config.productionTip = false
 Vue.component(Scroll.name,Scroll)
-Vue.use(loading)
+Vue.use(loading).use(toast)
+Vue.prototype.$bus=new Vue()
 new Vue({
   router,
   store,

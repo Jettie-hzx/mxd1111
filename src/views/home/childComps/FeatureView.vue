@@ -1,13 +1,18 @@
 <template>
   <div class="ferture">
     <a href="https://act.moguji.com/zzlx67">
-    <img src="@/assets/img/home/recommend_bg.jpg" alt=""></a>
+    <img src="@/assets/img/home/recommend_bg.jpg" alt="" @load="featureViewLoad"></a>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'FeatureView'
+  name: 'FeatureView',
+  methods:{
+    featureViewLoad(){
+      this.$emit("featureViewLoad")
+    }
+  }
 }
 </script>
 

@@ -3,13 +3,18 @@
     <div class="content">
       <slot></slot>
     </div>
+    <back-top v-show="isComShow&&isBackShow" 
+    @click.native="backTop"/>
   </div>
 </template>
 
 <script>
 import BScroll from "better-scroll";
+import {backTopMixin} from "common/mixin"
+//import {throttle} from "common/util"
 export default {
   name: "Scroll",
+ mixins:[backTopMixin],
   props:{
     probeType:{
       type:Number,
@@ -18,11 +23,21 @@ export default {
     pullUpLoad:{
       type:Boolean,
       default:false
+    },
+    isComShow:{
+      type:Boolean,
+      default:true
+    },
+    observeImage:{
+      type:Boolean,
+      default:false
     }
   },
   data() {
+    //const throttleRefresh=throttle(this.refresh,2000)
     return {
       scroll: null,
+      //throttleRefresh
     };
   },
   mounted() {
@@ -31,15 +46,22 @@ export default {
         click: true,
         mouseWheel: true,
         probeType:this.probeType,
-        pullUpLoad:this.pullUpLoad
+        pullUpLoad:this.pullUpLoad,
+        observeImage:this.observeImage,
+        observeDOM:true
         //pullDownRefresh:true
         // pullUpLoad: {
         //   threshold: 50,
         // },
       });
+      //const scrollThrottle=throttle(this.scrollEmit,200)
       if(this.probeType===2||this.probeType===3){
-       
-        this.scroll.on("scroll",position=>this.$emit("scroll",position))
+        this.scroll.on("scroll",position=>{
+          this.$emit("scroll",position)
+          //scrollThrottle(position)
+          this.isBackShow=Math.abs(position.y)>1000
+          })
+        
       }
       if(this.pullUpLoad){
         this.scroll.on("pullingUp",()=>this.$emit("pullingUp"))
@@ -56,6 +78,9 @@ export default {
     // });
   },
   methods: {
+    // scrollEmit(position){
+    //   this.$emit("scroll",position)
+    // },
     refresh() {
       console.log("-------");
       this.scroll && this.scroll.refresh();
@@ -65,6 +90,9 @@ export default {
     },
     finishPullUp(){
       this.scroll&&this.scroll.finishPullUp()
+    },
+    getScrollY(){
+      return this.scroll?this.scroll.y : 0
     }
   },
 };

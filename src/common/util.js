@@ -1,25 +1,72 @@
 //防抖函数
-export function debounce(fn,delay=1000){
+/**
+ * 
+ * @param {String} fn 
+ * @param {Number} delay 
+ * @returns 
+ */
+export function debounce(fn,delay=1000,immediate){
     let timer=null;
-    return function(){
+    let count=0;
+    return function(...args){
+      
         if(timer) clearTimeout(timer)
-        let args=arguments
-        timer=setTimeout(() => {
+        if(immediate){
+          if(!count){
             fn.apply(this,args)
-        }, delay);
+            count++
+            timer=setTimeout(() => {
+              count=0
+            }, delay);
+          }else{
+            count++
+            timer=setTimeout(() => {
+              fn.apply(this,args)
+              count=0
+              timer=null
+            }, delay);
+          }
+        }else{
+          timer=setTimeout(() => {
+            fn.apply(this,args)
+            timer=null
+          }, delay);
+        }
+        // if(immediate){
+        //   //console.log(timer);
+        //   let canRun=!timer
+        //   timer=setTimeout(() => {
+        //     timer=null
+            
+        //   }, delay);
+        //   if(canRun) fn.apply(this,args)
+        // }else{
+        //   timer=setTimeout(() => {
+        //     timer=null
+        //     fn.apply(this,args)
+        // }, delay);
+        // }
+        
     }
 }
 
 //节流函数
+/**
+ * 
+ * @param {String} fn 函数
+ * @param {Number} delay 延时时间
+ * @returns 
+ */
 export function throttle(fn,delay=100){
     let flag=true;
-    
-    return function(){
+    //let args=arguments
+    return function(...args){
         if(!flag) return
-        let args=arguments
+        
         flag=false
         setTimeout(() => {
             fn.apply(fn,args)
+            //this[fn](args);
             flag=true
             
         }, delay);

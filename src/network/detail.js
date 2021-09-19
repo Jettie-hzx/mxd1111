@@ -43,3 +43,4 @@ export class Shop {
       this.sizes = rule.tables;
     }
   }
+  

@@ -1,6 +1,6 @@
 <template>
   <div class="loading" v-show="isLoading">
-      <div v-for="(item,index) in 5" :key="index" 
+      <div v-for="(item,index) in 3" :key="index" 
       class="dots" :class="{active:currentIndex==index}"></div>
   </div>
 </template>
@@ -16,8 +16,8 @@ export default {
     },
     mounted(){
         setInterval(()=>{
-            this.currentIndex=++this.currentIndex%5
-        },200)
+            this.currentIndex=++this.currentIndex%3
+        },400)
     },
     methods:{
         show(){

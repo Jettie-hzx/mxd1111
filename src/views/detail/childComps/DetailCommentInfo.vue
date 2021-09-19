@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="commentInfo !== null && commentInfo.images !== undefined"
+    v-if="isReady"
     class="comment-info"
   >
     <div class="info-header">
@@ -11,7 +11,8 @@
       </div>
     </div>
     <div class="info-user">
-      <img :src="commentInfo.user.avatar" alt="" />
+      <img :src="commentInfo.user.avatar" alt="" 
+      />
       <span>{{ commentInfo.user.uname }}</span>
     </div>
     <div class="info-detail">
@@ -20,7 +21,7 @@
         <span class="data">{{ date }}</span>
         <span>{{ commentInfo.style }}</span>
       </div>
-      <div class="info-imgs">
+      <div class="info-imgs" >
         <img
           :src="item"
           v-for="(item, index) in commentInfo.images"
@@ -43,6 +44,27 @@ export default {
         return {};
       },
     },
+  },
+  data(){
+    return{
+      isReady:false
+    }
+  },
+  created(){
+    //解决一开始子组件创建成功，但父组件赋值操作未完成，传给
+    //子组件的对象为空，获取对象里面属性控制台报错的问题
+    //因为父组件是通过网络请求进行赋值，是异步操作
+    const timer=setInterval(()=>{
+      if(Object.keys(this.commentInfo).length){
+        this.isReady=true
+        
+      }
+     
+    },200)
+    setTimeout(()=>{
+      clearInterval(timer)
+      this.$emit("commentFinish")
+    },601)
   },
   computed: {
     date() {
