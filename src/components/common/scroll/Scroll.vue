@@ -3,7 +3,7 @@
     <div class="content">
       <slot></slot>
     </div>
-    <back-top v-show="isComShow&&isBackShow" 
+    <back-top v-if="isComShow&&isBackShow" 
     @click.native="backTop"/>
   </div>
 </template>
@@ -26,7 +26,7 @@ export default {
     },
     isComShow:{
       type:Boolean,
-      default:true
+      default:false
     },
     observeImage:{
       type:Boolean,
@@ -82,7 +82,7 @@ export default {
     //   this.$emit("scroll",position)
     // },
     refresh() {
-      console.log("-------");
+      console.log("我刷新了");
       this.scroll && this.scroll.refresh();
     },
     scrollTo(x,y,time){

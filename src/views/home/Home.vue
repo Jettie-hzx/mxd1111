@@ -16,6 +16,7 @@
       ref="scroll"
       :probeType="3"
       pullUpLoad
+      isComShow
       @pullingUp="loadMore"
       @scroll="contentScroll"
     >

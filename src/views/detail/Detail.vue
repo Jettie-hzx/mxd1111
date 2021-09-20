@@ -5,6 +5,7 @@
       class="detail-scroll"
       :probe-type="3"
       observeImage
+      isComShow
       ref="scroll"
       @scroll="contentScroll"
     >
@@ -100,7 +101,7 @@ export default {
    ...mapActions(['addCart']),
     imageLoad() {
       this.$refs.scroll.refresh();
-      //this.getThemeTopY()
+      this.getThemeTopY()
     },
     commentFinish(){
       this.getThemeTopY()

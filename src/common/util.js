@@ -92,6 +92,15 @@ export function formatDate(date, fmt) {
     }
     return fmt;
   }
-  function padLeftZero (str) {
+  export function padLeftZero (str) {
     return ('00' + str).substr(str.length);
   }
+  // 去除对象中某个属性的方法
+  export function exclude(keys) {
+    return function excluded(obj) {
+        return Object.keys(obj).reduce((res, k) => {
+                if(!keys.includes(k)) res[k] = obj[k];
+                return res;
+        }, {})
+    }
+}
