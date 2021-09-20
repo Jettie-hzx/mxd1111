@@ -170,11 +170,7 @@ export default {
       //this.$refs.scroll.refresh();
       this.tabOffsetTop = this.$refs.tabControl2.$el.offsetTop;
       //console.log(this.tabOffsetTop);
-      // this.tabTopY = {
-      //   pop: -(this.tabOffsetTop-44),
-      //   new: -(this.tabOffsetTop-44),
-      //   sell: -(this.tabOffsetTop-44),
-      // };
+      
     },
     // forceRerender(){
     //   this.home_swiper+=1

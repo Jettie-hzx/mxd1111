@@ -40,6 +40,7 @@ import DetailCommentInfo from "./childComps/DetailCommentInfo";
 import GoodsList from "components/content/goods/GoodsList.vue";
 import DetailBottomBar from "./childComps/DetailBottomBar.vue";
 
+import {mapActions} from "vuex"
 import {
   getDetail,
   getRecommend,
@@ -48,9 +49,6 @@ import {
   GoodsParam,
 } from "network/detail";
 
-
-
-//import { throttle } from "common/util";
 export default {
   name: "Detail",
  
@@ -75,7 +73,7 @@ export default {
       detailInfo: {},
       commentInfo: {},
       recommends: [],
-      product:{},
+      
       themeTopY:[],
       currentIndex:0
     };
@@ -99,7 +97,7 @@ export default {
     })
   },
   methods: {
-   
+   ...mapActions(['addCart']),
     imageLoad() {
       this.$refs.scroll.refresh();
       //this.getThemeTopY()
@@ -123,14 +121,16 @@ export default {
 
     },
     addToCart() {
-      this.product.iid = this.iid;
-      this.product.img = this.topImages[0];
-      this.product.title = this.goods.title;
-      this.product.desc = this.goods.desc;
-      this.product.newPrice = this.goods.realPrice;
-      this.$store.commit("addCart",this.product)
+      const product={}
+      product.iid = this.iid;
+      product.img = this.topImages[0];
+      product.title = this.goods.title;
+      product.desc = this.goods.desc;
+      product.newPrice = this.goods.realPrice;
+      //this.$store.commit("addCart",this.product)
       //.then(res=>this.$toast.show(res))
-      
+      this.addCart(product).then(res=>this.$toast.show(res))
+      //this.$store.dispatch("addCart",product).then(res=>this.$toast.show(res))
     },
     async getDetail() {
       const { result: data } = await getDetail(this.iid);
